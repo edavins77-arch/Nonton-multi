@@ -1,96 +1,110 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multiple YouTube Viewer</title>
+    <title>Multi YouTube Player</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
             text-align: center;
-            background-color: #f0f0f0;
-            padding: 10px;
+            padding: 20px;
+            margin: 0;
         }
         .container {
-            max-width: 600px;
+            max-width: 1200px;
             margin: 0 auto;
         }
-        input {
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .video-box {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            background: #000;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(255,255,255,0.1);
+        }
+        .video-box iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 12px;
-            margin: 6px 0;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            height: 100%;
+            border: 0;
+        }
+        .input-area {
+            margin-bottom: 20px;
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            margin: 5px;
+        }
+        input {
+            width: 60%;
+            max-width: 400px;
         }
         button {
-            width: 100%;
-            padding: 14px;
-            background-color: #333;
+            background-color: #ff0000;
             color: white;
-            border: none;
             cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-            border-radius: 4px;
+            font-weight: bold;
         }
-        #videoGrid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 15px;
-            margin-top: 25px;
-        }
-        iframe {
-            width: 100%;
-            height: 200px;
-            border: none;
-            background: #000;
+        button:hover {
+            background-color: #cc0000;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Multiple YouTube Videos Viewer</h2>
-    <p>Tempel link YouTube di bawah ini:</p>
+    <h1>Multi YouTube Player</h1>
+    <p>Masukkan Link Video YouTube untuk Menonton Sekaligus</p>
     
-    <input type="text" class="yt-link" placeholder="https://www.youtube.com/watch?v=...">
-    <input type="text" class="yt-link" placeholder="https://www.youtube.com/watch?v=...">
-    <input type="text" class="yt-link" placeholder="https://www.youtube.com/watch?v=...">
-    <input type="text" class="yt-link" placeholder="https://www.youtube.com/watch?v=...">
+    <div class="input-area">
+        <input type="text" id="youtubeLink" placeholder="Tempel link video YouTube di sini...">
+        <button onclick="addVideo()">Tambah Video</button>
+    </div>
 
-    <button onclick="watchShow()">Watch the show</button>
+    <div class="grid" id="videoGrid">
+        </div>
 </div>
 
-<div id="videoGrid"></div>
-
 <script>
-function getYouTubeId(url) {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
-}
+    function extractVideoId(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
 
-function watchShow() {
-    const inputs = document.querySelectorAll('.yt-link');
-    const grid = document.getElementById('videoGrid');
-    grid.innerHTML = '';
-
-    inputs.forEach(input => {
-        const url = input.value.trim();
-        if (url) {
-            const videoId = getYouTubeId(url);
-            if (videoId) {
-                const iframe = document.createElement('iframe');
-                iframe.src = `https://www.youtube.com/embed/${videoId}`;
-                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-                iframe.allowFullscreen = true;
-                grid.appendChild(iframe);
-            }
+    function addVideo() {
+        const urlInput = document.getElementById('youtubeLink');
+        const videoId = extractVideoId(urlInput.value);
+        
+        if (videoId) {
+            const grid = document.getElementById('videoGrid');
+            const videoBox = document.createElement('div');
+            videoBox.className = 'video-box';
+            videoBox.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`;
+            grid.appendChild(videoBox);
+            urlInput.value = ''; // Reset input
+        } else {
+            alert('Link YouTube tidak valid. Pastikan linknya benar ya!');
         }
-    });
-}
+    }
 </script>
 
 </body>
