@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi YouTube Player</title>
+    <title>Multi YouTube Player - Auto Screen</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,10 +17,70 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+        .input-area {
+            margin-bottom: 20px;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        input {
+            width: 80%;
+            max-width: 500px;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 15px;
+            display: inline-block;
+            background-color: #fff;
+            color: #000;
+        }
+        .screen-options {
+            margin: 10px 0 20px 0;
+        }
+        .screen-btn {
+            padding: 10px 15px;
+            font-size: 16px;
+            margin: 4px;
+            border: 2px solid #ff0000;
+            background-color: transparent;
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .screen-btn.active, .screen-btn:hover {
+            background-color: #ff0000;
+            color: white;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        .action-btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            background-color: #00cc99;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+            transition: 0.3s;
+        }
+        .action-btn:hover {
+            background-color: #00a37a;
+        }
+        .clear-btn {
+            background-color: #555;
+        }
+        .clear-btn:hover {
+            background-color: #333;
+        }
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
             margin-top: 20px;
         }
         .video-box {
@@ -40,43 +100,28 @@
             height: 100%;
             border: 0;
         }
-        .input-area {
-            margin-bottom: 20px;
-            background: #1e1e1e;
-            padding: 15px;
-            border-radius: 8px;
-        }
-        input, button {
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: none;
-            margin: 5px;
-        }
-        input {
-            width: 60%;
-            max-width: 400px;
-        }
-        button {
-            background-color: #ff0000;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #cc0000;
-        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>Multi YouTube Player</h1>
-    <p>Masukkan Link Video YouTube untuk Menonton Sekaligus</p>
+    <p>Pilih jumlah layar, masukkan link, dan tonton otomatis sekaligus!</p>
     
     <div class="input-area">
-        <input type="text" id="youtubeLink" placeholder="Tempel link video YouTube di sini...">
-        <button onclick="addVideo()">Tambah Video</button>
+        <input type="text" id="youtubeLink" placeholder="Tempel/Paste link video YouTube di sini...">
+        
+        <div class="screen-options">
+            <p style="margin: 5px 0;">Pilih Jumlah Layar:</p>
+            <button class="screen-btn" onclick="setScreens(2)">2</button>
+            <button class="screen-btn" onclick="setScreens(4)">4</button>
+            <button class="screen-btn" onclick="setScreens(6)">6</button>
+            <button class="screen-btn active" onclick="setScreens(8)">8</button>
+            <button class="screen-btn" onclick="setScreens(10)">10</button>
+        </div>
+
+        <button class="action-btn" onclick="generateVideos()">Buka Layar Otomatis</button>
+        <button class="action-btn clear-btn" onclick="clearGrid()">Hapus Semua</button>
     </div>
 
     <div class="grid" id="videoGrid">
@@ -84,26 +129,44 @@
 </div>
 
 <script>
+    let selectedScreens = 8; // Default awal otomatis 8 layar
+
+    function setScreens(num) {
+        selectedScreens = num;
+        const buttons = document.querySelectorAll('.screen-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
     function extractVideoId(url) {
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
         const match = url.match(regExp);
         return (match && match[2].length === 11) ? match[2] : null;
     }
 
-    function addVideo() {
+    function generateVideos() {
         const urlInput = document.getElementById('youtubeLink');
         const videoId = extractVideoId(urlInput.value);
+        const grid = document.getElementById('videoGrid');
         
-        if (videoId) {
-            const grid = document.getElementById('videoGrid');
+        if (!videoId) {
+            alert('Link YouTube tidak valid. Pastikan alamatnya benar ya!');
+            return;
+        }
+
+        grid.innerHTML = ''; 
+
+        for (let i = 0; i < selectedScreens; i++) {
             const videoBox = document.createElement('div');
             videoBox.className = 'video-box';
-            videoBox.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`;
+            videoBox.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
             grid.appendChild(videoBox);
-            urlInput.value = ''; // Reset input
-        } else {
-            alert('Link YouTube tidak valid. Pastikan linknya benar ya!');
         }
+    }
+
+    function clearGrid() {
+        document.getElementById('videoGrid').innerHTML = '';
+        document.getElementById('youtubeLink').value = '';
     }
 </script>
 
