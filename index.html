@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple YouTube Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            padding: 10px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 6px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        #videoGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+        iframe {
+            width: 100%;
+            height: 200px;
+            border: none;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Multiple YouTube Videos Viewer</h2>
+    <p>Tempel link YouTube di bawah ini:</p>
+    
+    <input type="text" class="yt-link" placeholder="https://www.youtube.com/watch?v=...">
+    <input type="text" class="yt-link" placeholder="https://www.youtube.com/watch?v=...">
+    <input type="text" class="yt-link" placeholder="https://www.youtube.com/watch?v=...">
+    <input type="text" class="yt-link" placeholder="https://www.youtube.com/watch?v=...">
+
+    <button onclick="watchShow()">Watch the show</button>
+</div>
+
+<div id="videoGrid"></div>
+
+<script>
+function getYouTubeId(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+}
+
+function watchShow() {
+    const inputs = document.querySelectorAll('.yt-link');
+    const grid = document.getElementById('videoGrid');
+    grid.innerHTML = '';
+
+    inputs.forEach(input => {
+        const url = input.value.trim();
+        if (url) {
+            const videoId = getYouTubeId(url);
+            if (videoId) {
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://www.youtube.com/embed/${videoId}`;
+                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                iframe.allowFullscreen = true;
+                grid.appendChild(iframe);
+            }
+        }
+    });
+}
+</script>
+
+</body>
+</html>
